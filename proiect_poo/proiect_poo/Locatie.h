@@ -9,6 +9,7 @@ class Locatie
 {
 	//to do:, mutata in proprul fisier header
 private:
+	string parolaAdministratorSala;
 	string denumire;//
 	string adresa;//
 	string telefon;//
@@ -23,9 +24,11 @@ private:
 
 public:
 	Locatie();
-	Locatie(string denumire, string adresa, string telefon, int capacitate, double pretInchiriere);
+	Locatie(string denumire, string adresa, string telefon, int capacitate, double pretInchiriere, string parolaAdministratorSala = "Admin");
 	
-
+	//Setter si getter pentru parolaAdministratorSala
+	string getParolaAdministratorSala();
+	void setParolaAdministratorSala(string parolaAdministratorSala);
 	//Setter si getter pentru denumire
 	string getDenumire();
 	void setDenumire(string denumire);
@@ -72,373 +75,38 @@ public:
 	void setOcupareLocatie(int*** ocupareLocatie, int sectorModificat = -1, int randModificat = -1, int locModificat = -1, int stareNoua = -1);
 
 	//Constructorul de copiere
-	Locatie(const Locatie& l)
-	{
-		this->denumire = l.denumire;
-		this->adresa = l.adresa;
-		this->telefon = l.telefon;
-		this->capacitate = l.capacitate;
-		this->pretInchiriere = l.pretInchiriere;
-		this->nrSectoare = l.nrSectoare;
+	Locatie(const Locatie& l);
+	
 
-		//Copiere denumire sector
-		if (l.denumireSector != nullptr || l.nrSectoare > 0)
-		{
-			this->denumireSector = new char* [l.nrSectoare];
-			for (int i = 0; i < l.nrSectoare; i++)
-			{
-				(this->denumireSector)[i] = new char[strlen(l.denumireSector[i]) + 1];
-				strcpy((this->denumireSector)[i], l.denumireSector[i]);
-			}
-		}
-		else this->denumireSector = nullptr;
-		//Copiere contineLocuri
-		if (l.contineLocuri != nullptr && l.nrSectoare == this->nrSectoare)
-		{
-			this->contineLocuri = new bool[l.nrSectoare];
-			for (int i = 0; i < l.nrSectoare; i++)
-			{
-				this->contineLocuri[i] = l.contineLocuri[i];
-			}
-		}
-		else this->contineLocuri = nullptr;
-		//Copiere nrRanduriPerSector
-		if (l.nrRanduriPerSector != nullptr && l.contineLocuri != nullptr)
-		{
-			this->nrRanduriPerSector = new int[l.nrSectoare];
-			for (int i = 0; i < l.nrSectoare; i++)
-			{
-				this->nrRanduriPerSector[i] = l.nrRanduriPerSector[i];
-			}
-		}
-		else this->nrRanduriPerSector = nullptr;
-		//Copiere nrLocuriPerRand
-		if (l.nrLocuriPerRand != nullptr && l.contineLocuri != nullptr)
-		{
-			this->nrLocuriPerRand = new int* [l.nrSectoare];
-			for (int i = 0; i < l.nrSectoare; i++)
-			{
-				if (l.contineLocuri[i] != 0)
-				{
-					this->nrLocuriPerRand[i] = new int[l.nrRanduriPerSector[i]];
-					for (int j = 0; j < l.nrRanduriPerSector[i]; j++)
-					{
-						this->nrLocuriPerRand[i][j] = l.nrLocuriPerRand[i][j];
-					}
-				}
-
-			}
-		}
-		else this->nrLocuriPerRand = nullptr;
-
-		//Copiere ocupareLocatie
-		if (l.nrSectoare > 0 && l.nrRanduriPerSector != nullptr && l.nrLocuriPerRand != nullptr && l.ocupareLocatie != nullptr && l.contineLocuri != nullptr)
-		{
-			//Alocam o noua zona de memorie pentru ocupareLocatie
-			this->ocupareLocatie = new int** [l.nrSectoare];
-			for (int i = 0; i < l.nrSectoare; i++)
-			{
-				if (l.contineLocuri[i] != 0)
-				{
-					this->ocupareLocatie[i] = new int* [l.nrRanduriPerSector[i]];
-					for (int j = 0; j < this->nrRanduriPerSector[i]; j++)
-					{
-						this->ocupareLocatie[i][j] = new int[l.nrLocuriPerRand[i][j]];
-					}
-				}
-			}
-
-			//Copiem dintr-un vector in celalalt elementele
-			for (int i = 0; i < this->nrSectoare; i++)
-			{
-				for (int j = 0; j < this->nrRanduriPerSector[i]; j++)
-				{
-					for (int k = 0; k < this->nrLocuriPerRand[i][j]; k++)
-					{
-						this->ocupareLocatie[i][j][k] = l.ocupareLocatie[i][j][k];
-					}
-				}
-			}
-		}
-		else this->ocupareLocatie = nullptr;
-	}
-
-	~Locatie()
-	{
-		if (this->ocupareLocatie != nullptr)
-		{
-			for (int i = 0; i < nrSectoare; i++)
-			{
-				if (this->contineLocuri[i] != 0)
-				{
-					for (int j = 0; j < this->nrRanduriPerSector[i]; j++)
-					{
-						delete[] this->ocupareLocatie[i][j];
-					}
-					delete[] this->ocupareLocatie[i];
-				}
-			}
-			delete[] this->ocupareLocatie;
-			this->ocupareLocatie = nullptr;
-		}
-
-		if (this->nrLocuriPerRand != nullptr)
-		{
-			for (int i = 0; i < this->nrSectoare; i++)
-			{
-				if (this->contineLocuri[i] != 0)
-				{
-					delete[] this->nrLocuriPerRand[i];
-				}
-			}
-			delete[] this->nrLocuriPerRand;
-			this->nrLocuriPerRand = nullptr;
-		}
-
-		if (this->nrRanduriPerSector != nullptr)
-		{
-			delete[] this->nrRanduriPerSector;
-			this->nrRanduriPerSector = nullptr;
-		}
-
-		if (this->denumireSector != nullptr)
-		{
-			for (int i = 0; i < this->nrSectoare; i++)
-			{
-				delete[](this->denumireSector)[i];
-			}
-			delete[] this->denumireSector;
-			this->denumireSector = nullptr;
-		}
-
-		if (this->contineLocuri != nullptr)
-		{
-			delete[] this->contineLocuri;
-			this->contineLocuri = nullptr;
-		}
-	}
+	~Locatie();
 
 	//Create operator=
-	Locatie& operator=(const Locatie& l)
-	{
-		if (this != &l)
-		{
-			this->denumire = l.denumire;
-			this->adresa = l.adresa;
-			this->telefon = l.telefon;
-			this->capacitate = l.capacitate;
-			this->pretInchiriere = l.pretInchiriere;
-			this->nrSectoare = l.nrSectoare;
-
-			//Copiere denumire sector
-			if (l.denumireSector != nullptr || l.nrSectoare > 0)
-			{
-				//Dezalocam ce avem deja in vectorul de denumiri al sectoarelor
-				if (this->denumireSector != nullptr)
-				{
-					for (int i = 0; i < this->nrSectoare; i++)
-					{
-						delete[](this->denumireSector)[i];
-					}
-					delete[] this->denumireSector;
-				}
-
-				this->denumireSector = new char* [l.nrSectoare];
-				for (int i = 0; i < l.nrSectoare; i++)
-				{
-					(this->denumireSector)[i] = new char[strlen(l.denumireSector[i]) + 1];
-					strcpy((this->denumireSector)[i], l.denumireSector[i]);
-				}
-			}
-			else this->denumireSector = nullptr;
-			//Copiere contineLocuri
-			if (l.contineLocuri != nullptr && l.nrSectoare == this->nrSectoare)
-			{
-				if (this->contineLocuri != nullptr)
-					delete[] this->contineLocuri;
-
-				this->contineLocuri = new bool[l.nrSectoare];
-				for (int i = 0; i < l.nrSectoare; i++)
-				{
-					this->contineLocuri[i] = l.contineLocuri[i];
-				}
-			}
-			else this->contineLocuri = nullptr;
-			//Copiere nrRanduriPerSector
-			if (l.nrRanduriPerSector != nullptr)
-			{
-				if (this->nrRanduriPerSector != nullptr)
-				{
-					delete[] this->nrRanduriPerSector;
-					this->nrRanduriPerSector = nullptr;
-				}
-
-				this->nrRanduriPerSector = new int[l.nrSectoare];
-				for (int i = 0; i < l.nrSectoare; i++)
-				{
-					this->nrRanduriPerSector[i] = l.nrRanduriPerSector[i];
-				}
-			}
-			else this->nrRanduriPerSector = nullptr;
-			//Copiere nrLocuriPerRand
-			if (l.nrRanduriPerSector != nullptr && l.nrLocuriPerRand != nullptr)
-			{
-				if (this->nrLocuriPerRand != nullptr)
-				{
-					//dezalocam memoria doar daca avem ceva alocat
-					for (int i = 0; i < this->nrSectoare; i++)
-					{
-						delete[] this->nrLocuriPerRand[i];
-					}
-					delete[] this->nrLocuriPerRand;
-				}
-
-				this->nrLocuriPerRand = new int* [l.nrSectoare];
-				for (int i = 0; i < l.nrSectoare; i++)
-				{
-					this->nrLocuriPerRand[i] = new int[l.nrRanduriPerSector[i]];
-				}
-				for (int i = 0; i < l.nrSectoare; i++)
-				{
-					for (int j = 0; j < l.nrRanduriPerSector[i]; j++)
-					{
-						this->nrLocuriPerRand[i][j] = l.nrLocuriPerRand[i][j];
-					}
-				}
-			}
-			else this->nrLocuriPerRand = nullptr;
-			//Copiere ocupareLocatie
-			if (l.nrSectoare > 0 && l.nrRanduriPerSector != nullptr && l.nrLocuriPerRand != nullptr && l.ocupareLocatie != nullptr)
-			{
-				if (this->ocupareLocatie != nullptr)
-				{
-					//Dezalocam memoria doar daca avem ceva alocat
-
-					for (int i = 0; i < nrSectoare; i++)
-					{
-						for (int j = 0; j < this->nrRanduriPerSector[i]; j++)
-						{
-							delete[] this->ocupareLocatie[i][j];
-						}
-						delete[] this->ocupareLocatie[i];
-					}
-					delete[] this->ocupareLocatie;
-				}
-
-				//Alocam o noua zona de memorie pentru ocupareLocatie
-				this->ocupareLocatie = new int** [l.nrSectoare];
-				for (int i = 0; i < l.nrSectoare; i++)
-				{
-					this->ocupareLocatie[i] = new int* [l.nrRanduriPerSector[i]];
-					for (int j = 0; j < this->nrRanduriPerSector[i]; j++)
-					{
-						this->ocupareLocatie[i][j] = new int[l.nrLocuriPerRand[i][j]];
-					}
-				}
-
-				//Copiem dintr-un vector in celalalt elementele
-				for (int i = 0; i < this->nrSectoare; i++)
-				{
-					for (int j = 0; j < this->nrRanduriPerSector[i]; j++)
-					{
-						for (int k = 0; k < this->nrLocuriPerRand[i][j]; k++)
-						{
-							this->ocupareLocatie[i][j][k] = l.ocupareLocatie[i][j][k];
-						}
-					}
-				}
-			}
-			else this->ocupareLocatie = nullptr;
-		}
-		return *this;
-	}
+	Locatie& operator=(const Locatie& l);
 
 	//2 operatori supraincarcati
 
 	//Operatorii relationari	
 	//Operatorul >
-	bool operator>(const Locatie& l)
-	{
-		//verifica daca o locatie este mai incapatoare decat alta
-		if (this->capacitate > l.capacitate)
-			return true;
-		else return false;
-	}
+	bool operator>(const Locatie& l);
 	//Operatorul <
-	bool operator<(const Locatie& l)
-	{
-		//verifica daca o locatie este mai putin incapatoare decat alta
-		if (this->capacitate < l.capacitate)
-			return true;
-		else return false;
-	}
+	bool operator<(const Locatie& l);
 	//Operatorul >=
-	bool operator>=(const Locatie& l)
-	{
-		//verifica daca o locatie este mai incapatoare sau egala cu alta
-		if (this->capacitate >= l.capacitate)
-			return true;
-		else return false;
-	}
+	bool operator>=(const Locatie& l);
 	//Operatorul <=
-	bool operator<=(const Locatie& l)
-	{
-		//verifica daca o locatie este mai putin incapatoare sau egala cu alta
-		if (this->capacitate <= l.capacitate)
-			return true;
-		else return false;
-	}
+	bool operator<=(const Locatie& l);
 	//Operatorul ==
-	bool operator==(const Locatie& l)
-	{
-		//verifica daca o locatie are aceeasi capacitate cu alta
-		if (this->capacitate == l.capacitate)
-			return true;
-		else return false;
-	}
+	bool operator==(const Locatie& l);
 
 	//Operatorul ++ preincrementare
-	Locatie& operator++()
-	{
-		//incrementam capacitatea cu 1
-		this->capacitate++;
-		return *this;
-	}
+	Locatie& operator++();
 	//Operatorul ++ postincrementare
-	Locatie operator++(int)
-	{
-		//incrementam capacitatea cu 1
-		Locatie copie = *this;
-		this->capacitate++;
-		return copie;
-	}
+	Locatie operator++(int);
 
 	//2 Metode generice
 
-	void elibereazaSala()
-	{
-		if (this->ocupareLocatie != nullptr)
-		{
-			for (int i = 0; i < this->nrSectoare; i++)
-			{
-				for (int j = 0; j < this->nrRanduriPerSector[i]; j++)
-				{
-					for (int k = 0; k < this->nrLocuriPerRand[i][j]; k++)
-					{
-						this->ocupareLocatie[i][j] = 0;
-					}
-				}
-			}
-		}
-	}
+	void elibereazaSala();
 
-	void aseazaOmPeLoc(int sector, int, int rand, int loc)
-	{
-		if (sector > 0 && sector <= this->nrSectoare && rand > 0 && rand <= this->nrRanduriPerSector[sector] && loc > 0 && loc <= this->nrLocuriPerRand[sector][rand])
-		{
-			this->ocupareLocatie[sector][rand][loc] = 1;
-		}
-	}
+	int verificaParola(string parola);
 
 	//Citire si Afisare
 	friend ostream& operator<<(ostream&, Locatie);
