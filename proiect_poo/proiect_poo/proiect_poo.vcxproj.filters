@@ -27,6 +27,9 @@
     <ClCompile Include="Eveniment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Auxiliare.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Locatie.h">
@@ -36,6 +39,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Eveniment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Auxiliare.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
