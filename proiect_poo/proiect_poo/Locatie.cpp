@@ -24,12 +24,7 @@ Locatie::Locatie()
 Locatie::Locatie(string denumire, string adresa, string telefon, int capacitate, double pretInchiriere, string parolaAdministratorSala) : Locatie()
 {
 	//Validare parola
-	if (parolaAdministratorSala.length() < 8)
-	{
-		cout << "Parola trebuie sa contina minim 8 caractere!" << endl;
-		return;
-	}
-	else
+	if (parolaAdministratorSala.length() >= 8)
 	{
 		this->parolaAdministratorSala = parolaAdministratorSala;
 	}
@@ -39,26 +34,16 @@ Locatie::Locatie(string denumire, string adresa, string telefon, int capacitate,
 	{
 		this->denumire = denumire;
 	}
-	else
-	{
-		this->denumire = "Invalid";
-	}
+	
 	//Validare adresa
 	if (adresa.length() >= 3 && adresa.length() <= 100)
 	{
 		this->adresa = adresa;
 	}
-	else
-	{
-		this->adresa = "Invalid";
-	}
+	
 
 	//Validare nr telefon
-	if (telefon.length() != 10)
-	{
-		this->telefon = "Nr invalid";
-	}
-	else
+	if (telefon.length() == 10)
 	{
 
 		bool telefonValid = true;
@@ -66,32 +51,20 @@ Locatie::Locatie(string denumire, string adresa, string telefon, int capacitate,
 		{
 			if (!isdigit(telefon[i])) telefonValid = false;
 		}
-		if (!telefonValid)
-		{
-			this->telefon = "Nr invalid";
-		}
-		else
+		if (telefonValid)	
 		{
 			this->telefon = telefon;
 		}
 	}
 
 	//Validare capacitate
-	if (capacitate < 0)
-	{
-		this->capacitate = 0;
-	}
-	else
+	if (capacitate >= 0)
 	{
 		this->capacitate = capacitate;
 	}
 
 	//Validare pretInchiriere
-	if (pretInchiriere < 0)
-	{
-		this->pretInchiriere = 0;
-	}
-	else
+	if (pretInchiriere >= 0)
 	{
 		this->pretInchiriere = pretInchiriere;
 	}
@@ -638,7 +611,10 @@ int*** Locatie::getOcupareLocatie()
 		{
 			for (int k = 0; k < this->nrLocuriPerRand[i][j]; k++)
 			{
-				afisaj[i][j][k] = this->ocupareLocatie[i][j][k];
+				if (this->ocupareLocatie[i][j] != nullptr)
+					afisaj[i][j][k] = this->ocupareLocatie[i][j][k];
+				else
+					afisaj[i][j] = nullptr;
 			}
 		}
 	}
@@ -736,13 +712,18 @@ Locatie::Locatie(const Locatie& l)
 	this->nrSectoare = l.nrSectoare;
 
 	//Copiere denumire sector
-	if (l.denumireSector != nullptr || l.nrSectoare > 0)
+	if (l.denumireSector != nullptr && l.nrSectoare > 0)
 	{
 		this->denumireSector = new char* [l.nrSectoare];
 		for (int i = 0; i < l.nrSectoare; i++)
 		{
-			(this->denumireSector)[i] = new char[strlen(l.denumireSector[i]) + 1];
-			strcpy((this->denumireSector)[i], l.denumireSector[i]);
+			if (l.denumireSector[i] != nullptr)
+			{
+				(this->denumireSector)[i] = new char[strlen(l.denumireSector[i]) + 1];
+				strcpy((this->denumireSector)[i], l.denumireSector[i]);
+			}
+			else
+				(this->denumireSector)[i] = nullptr;
 		}
 	}
 	else this->denumireSector = nullptr;
@@ -883,21 +864,63 @@ Locatie& Locatie::operator=(const Locatie& l)
 		this->telefon = l.telefon;
 		this->capacitate = l.capacitate;
 		this->pretInchiriere = l.pretInchiriere;
-		this->nrSectoare = l.nrSectoare;
 
+		if (this->ocupareLocatie != nullptr)
+		{
+			for (int i = 0; i < this->nrSectoare; i++)
+			{
+				if (this->contineLocuri[i] != 0)
+				{
+					for (int j = 0; j < this->nrRanduriPerSector[i]; j++)
+					{
+						delete[] this->ocupareLocatie[i][j];
+					}
+					delete[] this->ocupareLocatie[i];
+				}
+			}
+			delete[] this->ocupareLocatie;
+			this->ocupareLocatie = nullptr;
+		}
+
+		if (this->nrLocuriPerRand != nullptr)
+		{
+			for (int i = 0; i < this->nrSectoare; i++)
+			{
+				if (this->contineLocuri[i] != 0)
+				{
+					delete[] this->nrLocuriPerRand[i];
+				}
+			}
+			delete[] this->nrLocuriPerRand;
+			this->nrLocuriPerRand = nullptr;
+		}
+
+		if (this->nrRanduriPerSector != nullptr)
+		{
+			delete[] this->nrRanduriPerSector;
+			this->nrRanduriPerSector = nullptr;
+		}
+
+		if (this->denumireSector != nullptr)
+		{
+			for (int i = 0; i < this->nrSectoare; i++)
+			{
+				delete[](this->denumireSector)[i];
+			}
+			delete[] this->denumireSector;
+			this->denumireSector = nullptr;
+		}
+
+		if (this->contineLocuri != nullptr)
+		{
+			delete[] this->contineLocuri;
+			this->contineLocuri = nullptr;
+		}
+
+		this->nrSectoare = l.nrSectoare;
 		//Copiere denumire sector
 		if (l.denumireSector != nullptr || l.nrSectoare > 0)
 		{
-			//Dezalocam ce avem deja in vectorul de denumiri al sectoarelor
-			if (this->denumireSector != nullptr)
-			{
-				for (int i = 0; i < this->nrSectoare; i++)
-				{
-					delete[](this->denumireSector)[i];
-				}
-				delete[] this->denumireSector;
-			}
-
 			this->denumireSector = new char* [l.nrSectoare];
 			for (int i = 0; i < l.nrSectoare; i++)
 			{
@@ -909,9 +932,6 @@ Locatie& Locatie::operator=(const Locatie& l)
 		//Copiere contineLocuri
 		if (l.contineLocuri != nullptr && l.nrSectoare == this->nrSectoare)
 		{
-			if (this->contineLocuri != nullptr)
-				delete[] this->contineLocuri;
-
 			this->contineLocuri = new bool[l.nrSectoare];
 			for (int i = 0; i < l.nrSectoare; i++)
 			{
@@ -922,12 +942,6 @@ Locatie& Locatie::operator=(const Locatie& l)
 		//Copiere nrRanduriPerSector
 		if (l.nrRanduriPerSector != nullptr)
 		{
-			if (this->nrRanduriPerSector != nullptr)
-			{
-				delete[] this->nrRanduriPerSector;
-				this->nrRanduriPerSector = nullptr;
-			}
-
 			this->nrRanduriPerSector = new int[l.nrSectoare];
 			for (int i = 0; i < l.nrSectoare; i++)
 			{
@@ -938,16 +952,6 @@ Locatie& Locatie::operator=(const Locatie& l)
 		//Copiere nrLocuriPerRand
 		if (l.nrRanduriPerSector != nullptr && l.nrLocuriPerRand != nullptr)
 		{
-			if (this->nrLocuriPerRand != nullptr)
-			{
-				//dezalocam memoria doar daca avem ceva alocat
-				for (int i = 0; i < this->nrSectoare; i++)
-				{
-					delete[] this->nrLocuriPerRand[i];
-				}
-				delete[] this->nrLocuriPerRand;
-			}
-
 			this->nrLocuriPerRand = new int* [l.nrSectoare];
 			for (int i = 0; i < l.nrSectoare; i++)
 			{
@@ -965,21 +969,6 @@ Locatie& Locatie::operator=(const Locatie& l)
 		//Copiere ocupareLocatie
 		if (l.nrSectoare > 0 && l.nrRanduriPerSector != nullptr && l.nrLocuriPerRand != nullptr && l.ocupareLocatie != nullptr)
 		{
-			if (this->ocupareLocatie != nullptr)
-			{
-				//Dezalocam memoria doar daca avem ceva alocat
-
-				for (int i = 0; i < nrSectoare; i++)
-				{
-					for (int j = 0; j < this->nrRanduriPerSector[i]; j++)
-					{
-						delete[] this->ocupareLocatie[i][j];
-					}
-					delete[] this->ocupareLocatie[i];
-				}
-				delete[] this->ocupareLocatie;
-			}
-
 			//Alocam o noua zona de memorie pentru ocupareLocatie
 			this->ocupareLocatie = new int** [l.nrSectoare];
 			for (int i = 0; i < l.nrSectoare; i++)
@@ -1094,7 +1083,7 @@ int Locatie::verificaParola(string parola)
 ostream& operator<<(ostream& out, Locatie l)
 {
 	out << "Locatia cu denumirea " << l.denumire << " se afla la adresa " << l.adresa;
-	out << "\nAceasta poate fi inchiriata pentru " << setprecision(2) << fixed << l.pretInchiriere << " de lei pe zi";
+	out << "\nAceasta poate fi inchiriata pentru " << setprecision(2) << fixed << l.pretInchiriere << " lei pe zi";
 	out << "\nLocatia are capacitatea de " << l.capacitate << " locuri impartite in " << l.nrSectoare << " sectiuni\n";
 	if (l.nrSectoare != 0 && l.denumireSector != nullptr)
 	{
@@ -1124,7 +1113,7 @@ ostream& operator<<(ostream& out, Locatie l)
 
 
 	}
-	out << "Pentru alte detalii sunati la numarul " << l.telefon << endl;
+	out << "\nPentru alte detalii sunati la numarul " << l.telefon << endl;
 	return out;
 }
 
@@ -1334,6 +1323,10 @@ istream& operator>>(istream& in, Locatie& l)
 						l.ocupareLocatie[i][j][k] = 0;
 					}
 				}
+			}
+			else
+			{
+				l.nrRanduriPerSector[i] = 0;
 			}
 		}
 	}

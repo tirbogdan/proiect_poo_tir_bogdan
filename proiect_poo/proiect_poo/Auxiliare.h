@@ -7,9 +7,6 @@
 using namespace std;
 class Auxiliare
 {
-private:
-	Locatie *locatii;
-	static int nrLocatii;
 public:
 	Auxiliare();
 	
@@ -23,6 +20,6 @@ public:
 	static void functionalitateMeniuEvenimente(string& optiune);
 	static bool verificareOptiune(string optiune, int nrMaxOptiuni);
 	static void citesteLocatie(Locatie& locatii);
-
+	static bool continuam();
 };
 

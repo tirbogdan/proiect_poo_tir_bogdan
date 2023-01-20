@@ -7,20 +7,19 @@ using namespace std;
 
 class Locatie
 {
-	//to do:, mutata in proprul fisier header
 private:
 	string parolaAdministratorSala;
-	string denumire;//
-	string adresa;//
-	string telefon;//
-	int capacitate;//
-	double pretInchiriere;//
-	int nrSectoare;//
-	char** denumireSector;//
-	bool* contineLocuri;//
-	int* nrRanduriPerSector;//
-	int** nrLocuriPerRand;//
-	int*** ocupareLocatie;//
+	string denumire;
+	string adresa;
+	string telefon;
+	int capacitate;
+	double pretInchiriere;
+	int nrSectoare;
+	char** denumireSector;
+	bool* contineLocuri;
+	int* nrRanduriPerSector;
+	int** nrLocuriPerRand;
+	int*** ocupareLocatie;
 
 public:
 	Locatie();

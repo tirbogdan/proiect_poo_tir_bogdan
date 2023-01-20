@@ -221,3 +221,21 @@ void Auxiliare::functionalitateMeniuEvenimente(string& optiune)
 			cout << "Optiunea selectata nu este valida!" << endl;
 	} while (optiune != "0");
 }
+
+bool Auxiliare::continuam()
+{
+	string raspuns;
+	cout << "Continuam?" << endl;
+	getline(cin, raspuns);
+	while (!(raspuns == "da" || raspuns == "Da" || raspuns == "DA" || raspuns == "dA" || raspuns == "nu" || raspuns == "Nu" || raspuns == "NU" || raspuns == "nU"))
+	{
+		cout << "Trebuie sa imi spui da sau nu. E o intrebare..." << endl;
+		getline(cin, raspuns);
+	}
+	if (raspuns == "nu" || raspuns == "Nu" || raspuns == "NU" || raspuns == "nU")
+	{
+		cout << "Ok, atat de vazut aici atunci." << endl;
+		return false;
+	}
+	return true;
+}

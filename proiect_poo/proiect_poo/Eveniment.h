@@ -6,7 +6,6 @@
 using namespace std;
 class Eveniment
 {
-	//to do: implementare in propriul fisier header
 private:
 	string denumire;
 	string organizator;
